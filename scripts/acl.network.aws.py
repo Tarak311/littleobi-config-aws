@@ -14,13 +14,21 @@ with open('./data/creds.json') as aws_creds:
 with open('./data/data.json') as data_file:
   data = json.load(data_file)   
 
-
 config = terrascript.Terrascript()
+config += terrascript.provider.aws(region=creds["region"],access_key=creds["access_key"],secret_key=creds["secret_key"])
+
 
 public_subnets = []
 private_subnets = []
 secured_subnets = []
-
+config += terrascript.data.aws_vpc(
+  "littleobi-vpc-d",
+  filter = {
+    "name"   : "tag:Name",
+    "values" : ["littleobi-vpc"],
+    }
+  
+)
 
 get_subnets.get_public_subnets(public_subnets,config)
 
@@ -33,7 +41,7 @@ get_subnets.get_secured_subnets(secured_subnets,config)
 config += terrascript.resource.aws_network_acl(
   "littleobi-pub-acl",
   subnet_ids = public_subnets,
-  vpc_id = "${aws_vpc.littleobi-vpc.id}",
+  vpc_id = "${data.aws_vpc.littleobi-vpc-d.id}",
   tags={
         "Flag"          : "Compliant",
         "Access"        : "Public",
@@ -48,7 +56,7 @@ config += terrascript.resource.aws_network_acl(
 config += terrascript.resource.aws_network_acl(
   "littleobi-priv-acl",
   subnet_ids = private_subnets,
-  vpc_id = "${aws_vpc.littleobi-vpc.id}",
+  vpc_id = "${data.aws_vpc.littleobi-vpc-d.id}",
   tags={
         "Flag"          : "Compliant",
         "Access"        : "Private",
@@ -63,7 +71,7 @@ config += terrascript.resource.aws_network_acl(
 
 config += terrascript.resource.aws_network_acl(
   "littleobi-open-acl",
-  vpc_id = "${aws_vpc.littleobi-vpc.id}",
+  vpc_id = "${data.aws_vpc.littleobi-vpc-d.id}",
   tags={
         "Flag"          : "Compliant",
         "Access"        : "Open",
@@ -78,7 +86,7 @@ config += terrascript.resource.aws_network_acl(
 config += terrascript.resource.aws_network_acl(
   "littleobi-sec-acl",
   subnet_ids = secured_subnets,
-  vpc_id = "${aws_vpc.littleobi-vpc.id}",
+  vpc_id = "${data.aws_vpc.littleobi-vpc-d.id}",
   tags={
         "Flag"          : "Compliant",
         "Access"        : "Secured",
@@ -90,5 +98,5 @@ config += terrascript.resource.aws_network_acl(
         }
 )
 
-with open('../output/acl.network.aws.tf.json', 'w', encoding='utf-8') as config_file_tf:
+with open('../output/postcore/acl.network.aws.tf.json', 'w', encoding='utf-8') as config_file_tf:
   json.dump(config,config_file_tf,ensure_ascii=False, indent=4)

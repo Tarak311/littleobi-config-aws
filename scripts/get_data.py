@@ -1,4 +1,9 @@
 import json
+import terrascript
+import terrascript.provider
+import terrascript.resource
+import terrascript.data
+import ipaddress 
 
 def get_data(creds,json_subnet,data):
     with open('./data/data.json') as data_file:
@@ -11,3 +16,20 @@ def get_data(creds,json_subnet,data):
         json_subnet = json.load(data_subnet)
 
 
+def get_main_route_table(route_table_type,xconfig):
+    xconfig += terrascript.data.aws_route_table(
+                "littleobi-rt-"+ route_table_type,
+                filter = {
+                    "name"   : "tag:Access",
+                    "values" : [route_table_type],
+                    }
+            )
+        
+def get_route_table(route_table_type,xconfig,name):
+    xconfig += terrascript.data.aws_route_table(
+                "littleobi-rt-"+ route_table_type,
+                filter = {
+                    "name"   : "tag:Name",
+                    "values" : [name],
+                    }
+            )
