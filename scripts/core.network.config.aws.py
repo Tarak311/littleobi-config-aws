@@ -14,7 +14,7 @@ with open('./data/data.json') as data_file:
   data = json.load(data_file)   
 config = terrascript.Terrascript()
 security_config = terrascript.Terrascript()
-config += terrascript.provider.aws(region="us-east-2",access_key=creds["access_key"],secret_key=creds["secret_key"])
+config += terrascript.provider.aws(region=creds["region"],access_key=creds["access_key"],secret_key=creds["secret_key"])
 config += terrascript.resource.aws_vpc(
     "littleobi-vpc",
     enable_dns_support=True,
