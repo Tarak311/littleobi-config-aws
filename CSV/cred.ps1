@@ -1,1 +1,0 @@
-Set-AWSCredential -AccessKey AKIAVXVEQDAERU2XV6CO -SecretKey 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 -StoreAs tarak311
